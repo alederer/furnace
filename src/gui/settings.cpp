@@ -4816,9 +4816,6 @@ void FurnaceGUI::readConfig(DivConfig& conf, FurnaceGUISettingGroups groups) {
     settings.s3mOPL3=conf.getInt("s3mOPL3",1);
 
     settings.effectListViewType=conf.getInt("effectListViewType",0);;
-    std::vector<int> effectListPinnedEffectsVector=conf.getIntList("effectListPinnedEffects",{});
-    settings.effectListPinnedEffects.clear();
-    settings.effectListPinnedEffects.insert(effectListPinnedEffectsVector.begin(), effectListPinnedEffectsVector.end());
 
     settings.backupEnable=conf.getInt("backupEnable",1);
     settings.backupInterval=conf.getInt("backupInterval",30);
@@ -5110,6 +5107,12 @@ void FurnaceGUI::readConfig(DivConfig& conf, FurnaceGUISettingGroups groups) {
     settings.yrw801Path=conf.getString("yrw801Path","");
     settings.tg100Path=conf.getString("tg100Path","");
     settings.mu5Path=conf.getString("mu5Path","");
+  }
+
+  if (groups&GUI_SETTINGS_PINNED_EFFECTS) {
+    std::vector<int> effectListPinnedEffectsVector=conf.getIntList("effectListPinnedEffects",{});
+    settings.effectListPinnedEffects.clear();
+    settings.effectListPinnedEffects.insert(effectListPinnedEffectsVector.begin(), effectListPinnedEffectsVector.end());
   }
 
   clampSetting(settings.mainFontSize,2,96);
@@ -5416,9 +5419,6 @@ void FurnaceGUI::writeConfig(DivConfig& conf, FurnaceGUISettingGroups groups) {
     conf.set("s3mOPL3",settings.s3mOPL3);
 
     conf.set("effectListViewType",settings.effectListViewType);
-    std::vector<int> effectListPinnedEffectsVector{settings.effectListPinnedEffects.begin(), settings.effectListPinnedEffects.end()};
-    std::sort(effectListPinnedEffectsVector.begin(), effectListPinnedEffectsVector.end());
-    conf.set("effectListPinnedEffects",effectListPinnedEffectsVector);
 
     conf.set("backupEnable",settings.backupEnable);
     conf.set("backupInterval",settings.backupInterval);
@@ -5711,6 +5711,14 @@ void FurnaceGUI::writeConfig(DivConfig& conf, FurnaceGUISettingGroups groups) {
     conf.set("yrw801Path",settings.yrw801Path);
     conf.set("tg100Path",settings.tg100Path);
     conf.set("mu5Path",settings.mu5Path);
+  }
+
+  // pinned effects
+  if (groups&GUI_SETTINGS_PINNED_EFFECTS) {
+    std::vector<int> effectListPinnedEffectsVector{settings.effectListPinnedEffects.begin(), settings.effectListPinnedEffects.end()};
+    std::sort(effectListPinnedEffectsVector.begin(), effectListPinnedEffectsVector.end());
+    conf.set("effectListPinnedEffects",effectListPinnedEffectsVector);
+
   }
 }
 

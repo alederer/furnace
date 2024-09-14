@@ -103,6 +103,8 @@ void FurnaceGUI::drawEffectList() {
       for (Category& category : categories) {
         if (category.effects.empty()) continue;
 
+        int hoverEffValue=-1;
+        ImVec2 hoverEffItemRectMax{0.0f,0.0f};
         if (ImGui::TreeNodeEx(category.name, ImGuiTreeNodeFlags_DefaultOpen|ImGuiTreeNodeFlags_SpanAvailWidth)) {
 
           int rowCountMin=(int)(category.effects.size()/(float)columnCount);
@@ -143,6 +145,12 @@ void FurnaceGUI::drawEffectList() {
                   } else {
                     ImGui::Text(_("ERROR"));
                   }
+
+                  ImGui::SameLine();
+                  if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenOverlapped|ImGuiHoveredFlags_RectOnly)) {
+                    hoverEffValue=eff.value;
+                    hoverEffItemRectMax=ImGui::GetCursorPos();
+                  }
                 }
                 ImGui::EndTable();
               }
@@ -151,6 +159,26 @@ void FurnaceGUI::drawEffectList() {
             ImGui::EndTable();
           }
           ImGui::TreePop();
+        }
+
+        if (hoverEffValue!=-1) {
+          // draw pin/unpin
+          // @TODO: better hover detection and pin placement
+          bool isPinned=settings.effectListPinnedEffects.find(hoverEffValue)!=settings.effectListPinnedEffects.end();
+          ImVec2 pinSize=ImGui::CalcTextSize(isPinned ? ICON_FA_TRASH : ICON_FA_THUMB_TACK);
+          const ImVec2 cursorPos=ImGui::GetCursorPos();
+          ImVec2 pinPos=hoverEffItemRectMax;
+          pinPos.x-=pinSize.x*2.0f;
+          ImGui::SetCursorPos(pinPos);
+          ImGui::SetNextItemAllowOverlap();
+          if (isPinned && ImGui::Button(ICON_FA_TRASH "##Unpin")) {
+            settings.effectListPinnedEffects.erase(hoverEffValue);
+            writeConfig(e->getConfObject(),GUI_SETTINGS_PINNED_EFFECTS);
+          } else if (!isPinned && ImGui::Button(ICON_FA_THUMB_TACK "##Pin")) {
+            settings.effectListPinnedEffects.insert(hoverEffValue);
+            writeConfig(e->getConfObject(),GUI_SETTINGS_PINNED_EFFECTS);
+          }
+          ImGui::SetCursorPos(cursorPos);
         }
       }
     } else {
