@@ -32,6 +32,7 @@
 #include <future>
 #include <memory>
 #include <tuple>
+#include <unordered_set>
 #include "../pch.h"
 
 #include "fileDialog.h"
@@ -1994,6 +1995,8 @@ class FurnaceGUI {
     float vibrationStrength;
     int vibrationLength;
     int s3mOPL3;
+    int effectListViewType;
+    std::unordered_set<int> effectListPinnedEffects;
     String mainFontPath;
     String headFontPath;
     String patFontPath;
@@ -2254,6 +2257,7 @@ class FurnaceGUI {
       vibrationStrength(0.5f),
       vibrationLength(20),
       s3mOPL3(1),
+      effectListViewType(0),
       mainFontPath(""),
       headFontPath(""),
       patFontPath(""),

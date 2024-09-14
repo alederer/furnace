@@ -3624,6 +3624,20 @@ void FurnaceGUI::drawSettings() {
           settingsChanged=true;
         }
 
+        // SUBSECTION EFFECT LIST
+        CONFIG_SUBSECTION(_("Effect List"));
+        ImGui::Text(_("Effect list layout:"));
+        ImGui::Indent();
+        if (ImGui::RadioButton(_("Single list"),settings.effectListViewType==0)) {
+          settings.effectListViewType=0;
+          settingsChanged=true;
+        }
+        if (ImGui::RadioButton(_("Group by category"),settings.effectListViewType==1)) {
+          settings.effectListViewType=1;
+          settingsChanged=true;
+        }
+        ImGui::Unindent();
+
         // SUBSECTION MACRO EDITOR
         CONFIG_SUBSECTION(_("Macro Editor"));
         ImGui::Text(_("Macro editor layout:"));
@@ -4801,6 +4815,11 @@ void FurnaceGUI::readConfig(DivConfig& conf, FurnaceGUISettingGroups groups) {
 
     settings.s3mOPL3=conf.getInt("s3mOPL3",1);
 
+    settings.effectListViewType=conf.getInt("effectListViewType",0);;
+    std::vector<int> effectListPinnedEffectsVector=conf.getIntList("effectListPinnedEffects",{});
+    settings.effectListPinnedEffects.clear();
+    settings.effectListPinnedEffects.insert(effectListPinnedEffectsVector.begin(), effectListPinnedEffectsVector.end());
+
     settings.backupEnable=conf.getInt("backupEnable",1);
     settings.backupInterval=conf.getInt("backupInterval",30);
     settings.backupMaxCopies=conf.getInt("backupMaxCopies",5);
@@ -5320,6 +5339,7 @@ void FurnaceGUI::readConfig(DivConfig& conf, FurnaceGUISettingGroups groups) {
   clampSetting(settings.autoFillSave,0,1);
   clampSetting(settings.autoMacroStepSize,0,1);
   clampSetting(settings.s3mOPL3,0,1);
+  clampSetting(settings.effectListViewType,0,1);
 
   if (settings.exportLoops<0.0) settings.exportLoops=0.0;
   if (settings.exportFadeOut<0.0) settings.exportFadeOut=0.0;  
@@ -5394,6 +5414,11 @@ void FurnaceGUI::writeConfig(DivConfig& conf, FurnaceGUISettingGroups groups) {
     conf.set("vibrationLength",settings.vibrationLength);
 
     conf.set("s3mOPL3",settings.s3mOPL3);
+
+    conf.set("effectListViewType",settings.effectListViewType);
+    std::vector<int> effectListPinnedEffectsVector{settings.effectListPinnedEffects.begin(), settings.effectListPinnedEffects.end()};
+    std::sort(effectListPinnedEffectsVector.begin(), effectListPinnedEffectsVector.end());
+    conf.set("effectListPinnedEffects",effectListPinnedEffectsVector);
 
     conf.set("backupEnable",settings.backupEnable);
     conf.set("backupInterval",settings.backupInterval);
